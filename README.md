@@ -13,10 +13,22 @@ it currently:
 ## How to Run
 
 1. Make sure you have Python 3 installed.
-2. Run the app from the project directory:
+2. Install dependencies:
+
+```bash
+pip install -r requirements.txt
+```
+
+3. Start the web app:
 
 ```bash
 python app.py
 ```
 
-3. Follow the prompts to enter your name and birthdate.
+4. Open http://127.0.0.1:5000 in your browser.
+
+To use the original CLI mode instead, run:
+
+```bash
+python app.py --cli
+```
