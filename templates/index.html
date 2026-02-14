@@ -3,222 +3,342 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Birthday Actor Matcher</title>
+  <title>Bundesliga Odds Aggregator</title>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Pacifico&family=Nunito:wght@400;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
 
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
     body {
       min-height: 100vh;
+      font-family: 'Inter', sans-serif;
+      background: #fff;
+      color: #1a1a1a;
+    }
+
+    header {
+      background: #d20515;
+      color: #fff;
+      padding: 24px 0;
+      text-align: center;
+    }
+
+    header h1 {
+      font-size: 1.8rem;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+    }
+
+    header p {
+      font-size: 0.9rem;
+      opacity: 0.85;
+      margin-top: 4px;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 32px 20px;
+    }
+
+    .weekend-label {
+      text-align: center;
+      font-size: 0.85rem;
+      color: #888;
+      margin-bottom: 24px;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 60px 0;
+      color: #999;
+      font-size: 1rem;
+    }
+
+    .spinner {
+      width: 36px;
+      height: 36px;
+      border: 3px solid #eee;
+      border-top-color: #d20515;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      margin: 0 auto 16px;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .error-msg {
+      text-align: center;
+      background: #fff3f3;
+      border: 1px solid #ffcccc;
+      border-radius: 12px;
+      padding: 24px;
+      color: #c00;
+      font-size: 0.95rem;
+    }
+
+    .no-matches {
+      text-align: center;
+      padding: 60px 0;
+      color: #999;
+    }
+
+    .match-card {
+      background: #fff;
+      border: 1px solid #e8e8e8;
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 16px;
+      transition: box-shadow 0.2s;
+    }
+
+    .match-card:hover {
+      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    }
+
+    .match-time {
+      text-align: center;
+      font-size: 0.8rem;
+      color: #999;
+      margin-bottom: 16px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .teams-row {
       display: flex;
       align-items: center;
       justify-content: center;
-      font-family: 'Nunito', sans-serif;
-      background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 50%, #ffd1ff 100%);
-      overflow: hidden;
-      position: relative;
+      gap: 20px;
+      margin-bottom: 20px;
     }
 
-    .confetti {
-      position: fixed;
-      width: 10px;
-      height: 10px;
-      border-radius: 2px;
-      opacity: 0.8;
-      animation: fall linear forwards;
-      pointer-events: none;
+    .team {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex: 1;
+      max-width: 200px;
     }
 
-    @keyframes fall {
-      to { transform: translateY(110vh) rotate(720deg); opacity: 0; }
-    }
-
-    .card {
-      background: rgba(255, 255, 255, 0.92);
-      backdrop-filter: blur(10px);
-      border-radius: 24px;
-      padding: 48px 40px;
-      max-width: 480px;
-      width: 90%;
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.12);
-      text-align: center;
-      position: relative;
-      z-index: 1;
-    }
-
-    .cake-icon { font-size: 56px; margin-bottom: 8px; }
-
-    h1 {
-      font-family: 'Pacifico', cursive;
-      font-size: 2rem;
-      background: linear-gradient(135deg, #f857a6, #ff5858);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
+    .team img {
+      width: 64px;
+      height: 64px;
+      object-fit: contain;
       margin-bottom: 8px;
     }
 
-    .subtitle {
-      color: #888;
-      font-size: 0.95rem;
-      margin-bottom: 28px;
-    }
-
-    label {
-      display: block;
-      text-align: left;
-      font-weight: 700;
-      color: #444;
-      margin-bottom: 6px;
+    .team-name {
       font-size: 0.9rem;
-    }
-
-    input {
-      width: 100%;
-      padding: 12px 16px;
-      border: 2px solid #eee;
-      border-radius: 12px;
-      font-size: 1rem;
-      font-family: 'Nunito', sans-serif;
-      transition: border-color 0.2s;
-      margin-bottom: 18px;
-      outline: none;
-    }
-
-    input:focus { border-color: #f857a6; }
-
-    button {
-      width: 100%;
-      padding: 14px;
-      border: none;
-      border-radius: 12px;
-      background: linear-gradient(135deg, #f857a6, #ff5858);
-      color: #fff;
-      font-size: 1.05rem;
       font-weight: 700;
-      font-family: 'Nunito', sans-serif;
-      cursor: pointer;
-      transition: transform 0.15s, box-shadow 0.15s;
+      text-align: center;
+      line-height: 1.3;
     }
 
-    button:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 24px rgba(248, 87, 166, 0.35);
+    .vs {
+      font-size: 1.2rem;
+      font-weight: 800;
+      color: #ccc;
     }
 
-    button:active { transform: translateY(0); }
-
-    .result {
-      margin-top: 28px;
-      padding: 24px;
-      border-radius: 16px;
-      background: linear-gradient(135deg, #fdfcfb, #e2d1c3);
-      animation: pop 0.4s ease;
+    .odds-row {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
     }
 
-    .result .greeting {
-      font-family: 'Pacifico', cursive;
-      font-size: 1.5rem;
-      color: #f857a6;
-      margin-bottom: 6px;
+    .odds-box {
+      flex: 1;
+      max-width: 160px;
+      text-align: center;
+      background: #f7f7f7;
+      border-radius: 10px;
+      padding: 12px 8px;
+      transition: background 0.15s;
     }
 
-    .result .actor {
-      font-size: 1.1rem;
-      color: #555;
-      line-height: 1.5;
+    .odds-box:hover {
+      background: #eef;
     }
 
-    .result .actor strong { color: #333; }
+    .odds-label {
+      font-size: 0.7rem;
+      color: #999;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 4px;
+    }
 
-    .balloons { font-size: 32px; margin-top: 10px; }
+    .odds-value {
+      font-size: 1.3rem;
+      font-weight: 800;
+      color: #1a1a1a;
+    }
 
-    @keyframes pop {
-      0% { transform: scale(0.8); opacity: 0; }
-      100% { transform: scale(1); opacity: 1; }
+    .bookmaker-count {
+      text-align: center;
+      font-size: 0.75rem;
+      color: #bbb;
+      margin-top: 12px;
+    }
+
+    @media (max-width: 600px) {
+      .team img { width: 48px; height: 48px; }
+      .team-name { font-size: 0.8rem; }
+      .odds-value { font-size: 1.1rem; }
+      .teams-row { gap: 12px; }
     }
   </style>
 </head>
 <body>
-  <div class="card">
-    <div class="cake-icon">&#127874;</div>
-    <h1>Birthday Actor Matcher</h1>
-    <p class="subtitle">Find which famous actor shares your birthday!</p>
+  <header>
+    <h1>Bundesliga Odds</h1>
+    <p>Averaged betting odds from top European bookmakers</p>
+  </header>
 
-    <form id="form">
-      <label for="name">Your Name</label>
-      <input id="name" type="text" placeholder="e.g. Chris" autocomplete="off">
-
-      <label for="birthdate">Your Birthdate</label>
-      <input id="birthdate" type="date" required>
-
-      <button type="submit">Find My Actor &#127881;</button>
-    </form>
-
-    <div id="result" class="result" style="display:none">
-      <div class="greeting" id="greeting"></div>
-      <div class="actor" id="actor"></div>
-      <div class="balloons">&#127880; &#127881; &#127882;</div>
+  <div class="container">
+    <div id="weekend-label" class="weekend-label"></div>
+    <div id="content">
+      <div class="loading">
+        <div class="spinner"></div>
+        Loading odds...
+      </div>
     </div>
   </div>
 
   <script>
-    const CONFETTI_COLORS = ['#f857a6','#ff5858','#fad0c4','#a18cd1','#fbc2eb','#ffd1ff','#43e97b','#38f9d7','#ffecd2'];
-
-    function escapeHtml(str) {
-      const div = document.createElement('div');
-      div.textContent = str;
-      return div.innerHTML;
+    function formatDate(iso) {
+      const d = new Date(iso);
+      const opts = { weekday: 'short', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' };
+      return d.toLocaleDateString('en-GB', opts);
     }
 
-    function spawnConfetti() {
-      for (let i = 0; i < 60; i++) {
-        const el = document.createElement('div');
-        el.className = 'confetti';
-        el.style.left = Math.random() * 100 + 'vw';
-        el.style.top = '-10px';
-        el.style.background = CONFETTI_COLORS[Math.floor(Math.random() * CONFETTI_COLORS.length)];
-        el.style.width = (6 + Math.random() * 8) + 'px';
-        el.style.height = (6 + Math.random() * 8) + 'px';
-        el.style.animationDuration = (2 + Math.random() * 3) + 's';
-        el.style.animationDelay = (Math.random() * 1.5) + 's';
-        document.body.appendChild(el);
-        el.addEventListener('animationend', () => el.remove());
+    function renderMatch(m) {
+      const card = document.createElement('div');
+      card.className = 'match-card';
+
+      const time = document.createElement('div');
+      time.className = 'match-time';
+      time.textContent = formatDate(m.commence_time);
+      card.appendChild(time);
+
+      const teamsRow = document.createElement('div');
+      teamsRow.className = 'teams-row';
+
+      const homeTeam = document.createElement('div');
+      homeTeam.className = 'team';
+      const homeImg = document.createElement('img');
+      homeImg.src = m.home_logo;
+      homeImg.alt = m.home_team;
+      homeImg.onerror = function() { this.style.display = 'none'; };
+      const homeName = document.createElement('div');
+      homeName.className = 'team-name';
+      homeName.textContent = m.home_team;
+      homeTeam.appendChild(homeImg);
+      homeTeam.appendChild(homeName);
+
+      const vs = document.createElement('div');
+      vs.className = 'vs';
+      vs.textContent = 'vs';
+
+      const awayTeam = document.createElement('div');
+      awayTeam.className = 'team';
+      const awayImg = document.createElement('img');
+      awayImg.src = m.away_logo;
+      awayImg.alt = m.away_team;
+      awayImg.onerror = function() { this.style.display = 'none'; };
+      const awayName = document.createElement('div');
+      awayName.className = 'team-name';
+      awayName.textContent = m.away_team;
+      awayTeam.appendChild(awayImg);
+      awayTeam.appendChild(awayName);
+
+      teamsRow.appendChild(homeTeam);
+      teamsRow.appendChild(vs);
+      teamsRow.appendChild(awayTeam);
+      card.appendChild(teamsRow);
+
+      const oddsRow = document.createElement('div');
+      oddsRow.className = 'odds-row';
+
+      const labels = ['Home', 'Draw', 'Away'];
+      const values = [m.avg_home, m.avg_draw, m.avg_away];
+
+      for (let i = 0; i < 3; i++) {
+        const box = document.createElement('div');
+        box.className = 'odds-box';
+        const label = document.createElement('div');
+        label.className = 'odds-label';
+        label.textContent = labels[i];
+        const val = document.createElement('div');
+        val.className = 'odds-value';
+        val.textContent = values[i].toFixed(2);
+        box.appendChild(label);
+        box.appendChild(val);
+        oddsRow.appendChild(box);
+      }
+
+      card.appendChild(oddsRow);
+
+      const count = document.createElement('div');
+      count.className = 'bookmaker-count';
+      count.textContent = 'Averaged from ' + m.num_bookmakers + ' bookmaker' + (m.num_bookmakers !== 1 ? 's' : '');
+      card.appendChild(count);
+
+      return card;
+    }
+
+    async function load() {
+      const content = document.getElementById('content');
+      const weekendLabel = document.getElementById('weekend-label');
+
+      try {
+        const res = await fetch('/api/odds');
+        const data = await res.json();
+
+        if (data.error) {
+          content.innerHTML = '';
+          const err = document.createElement('div');
+          err.className = 'error-msg';
+          err.textContent = data.error;
+          content.appendChild(err);
+          return;
+        }
+
+        if (data.weekend) {
+          const from = new Date(data.weekend.from);
+          const to = new Date(data.weekend.to);
+          const opts = { weekday: 'long', month: 'long', day: 'numeric' };
+          weekendLabel.textContent =
+            from.toLocaleDateString('en-GB', opts) + ' \u2013 ' + to.toLocaleDateString('en-GB', opts);
+        }
+
+        content.innerHTML = '';
+
+        if (!data.matches || data.matches.length === 0) {
+          const noMatches = document.createElement('div');
+          noMatches.className = 'no-matches';
+          noMatches.textContent = 'No Bundesliga matches found for this weekend.';
+          content.appendChild(noMatches);
+          return;
+        }
+
+        data.matches.forEach(function(m) {
+          content.appendChild(renderMatch(m));
+        });
+
+      } catch (e) {
+        content.innerHTML = '';
+        const err = document.createElement('div');
+        err.className = 'error-msg';
+        err.textContent = 'Failed to load odds. Please try again later.';
+        content.appendChild(err);
       }
     }
 
-    setInterval(() => {
-      const el = document.createElement('div');
-      el.className = 'confetti';
-      el.style.left = Math.random() * 100 + 'vw';
-      el.style.top = '-10px';
-      el.style.background = CONFETTI_COLORS[Math.floor(Math.random() * CONFETTI_COLORS.length)];
-      el.style.width = '6px';
-      el.style.height = '6px';
-      el.style.animationDuration = (3 + Math.random() * 3) + 's';
-      document.body.appendChild(el);
-      el.addEventListener('animationend', () => el.remove());
-    }, 400);
-
-    document.getElementById('form').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const name = document.getElementById('name').value.trim();
-      const birthdate = document.getElementById('birthdate').value;
-      if (!birthdate) return;
-
-      const res = await fetch('/match', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({name, birthdate})
-      });
-      const data = await res.json();
-
-      document.getElementById('greeting').textContent = 'Happy Birthday, ' + data.name + '!';
-      document.getElementById('actor').innerHTML =
-        'An actor who shares your birthday: <strong>' + escapeHtml(data.actor) + '</strong>';
-      document.getElementById('result').style.display = 'block';
-      spawnConfetti();
-    });
+    load();
   </script>
 </body>
 </html>

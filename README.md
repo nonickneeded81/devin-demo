@@ -1,31 +1,28 @@
-# Birthday Actor Matcher
+# Bundesliga Odds Aggregator
 
-A web app that finds a famous actor or actress who shares your birthday.
+Aggregates and averages betting odds for upcoming Bundesliga weekend matches from multiple European bookmakers.
 
 Features:
-- Birthday-themed web UI with confetti animations
-- Looks up actors from a built-in list first, then falls back to Wikipedia
-- CLI mode available via `--cli` flag
+- Fetches live odds from The Odds API (EU bookmakers: Pinnacle, Unibet, 1xBet, etc.)
+- Averages Home / Draw / Away odds across all available bookmakers
+- Displays team logos alongside match pairings
+- Clean white UI with responsive design
 
 ## How to Run
 
-1. Make sure you have Python 3 installed.
+1. Get a free API key from [The Odds API](https://the-odds-api.com/#get-access) (Starter tier, 500 requests/month).
+
 2. Install dependencies:
 
 ```bash
 pip install -r requirements.txt
 ```
 
-3. Start the web app:
+3. Set your API key and start the app:
 
 ```bash
+export ODDS_API_KEY=your_key_here
 python app.py
 ```
 
 4. Open http://127.0.0.1:5000 in your browser.
-
-To use CLI mode instead:
-
-```bash
-python app.py --cli
-```
