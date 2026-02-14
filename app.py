@@ -34,7 +34,7 @@ def find_actor_by_birthdate(birthdate_str: str) -> str:
 def main():
     print("Welcome to the Birthday Actor Matcher!")
     
-    name = input("What is your name? ")
+    name = input("What is your name? ").strip() or "Guest"
     birthdate = input("Enter your birthdate (YYYY-MM-DD): ")
     
     actor = find_actor_by_birthdate(birthdate)
