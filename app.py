@@ -1,6 +1,7 @@
 import sys
 from datetime import datetime
 
+import requests as http_client
 from flask import Flask, jsonify, render_template, request
 
 ACTORS = {
@@ -21,11 +22,31 @@ ACTORS = {
 app = Flask(__name__)
 
 
+def _search_wikipedia_births(month: str, day: str) -> str:
+    url = f"https://api.wikimedia.org/feed/v1/wikipedia/en/onthisday/births/{month}/{day}"
+    headers = {"User-Agent": "BirthdayActorMatcher/1.0"}
+    try:
+        resp = http_client.get(url, headers=headers, timeout=8)
+        resp.raise_for_status()
+        births = resp.json().get("births", [])
+        for entry in births:
+            desc = entry.get("text", "").lower()
+            if "actor" in desc or "actress" in desc:
+                return entry["text"]
+        return "No matching actor found on Wikipedia either."
+    except Exception:
+        return "Could not reach Wikipedia right now. Please try again later."
+
+
 def find_actor_by_birthdate(birthdate_str: str) -> str:
     try:
         date_obj = datetime.strptime(birthdate_str, "%Y-%m-%d")
         month_day = date_obj.strftime("%m-%d")
-        return ACTORS.get(month_day, "No matching actor found.")
+        local = ACTORS.get(month_day)
+        if local:
+            return local
+        month, day = month_day.split("-")
+        return _search_wikipedia_births(month, day)
     except ValueError:
         return "Invalid date format. Please use YYYY-MM-DD."
 
