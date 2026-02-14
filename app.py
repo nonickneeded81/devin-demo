@@ -1,6 +1,7 @@
-from datetime import datetime
+import re
 
-# A very small dataset of American male actors and their birthdays (month-day)
+_DATE_RE = re.compile(r"^\d{4}-(\d{2}-\d{2})$")
+
 ACTORS = {
     "01-09": "Dave Bautista",
     "02-11": "Taylor Lautner",
@@ -23,12 +24,11 @@ def find_actor_by_birthdate(birthdate_str: str) -> str:
     extracts month and day,
     and returns a matching actor if available.
     """
-    try:
-        date_obj = datetime.strptime(birthdate_str, "%Y-%m-%d")
-        month_day = date_obj.strftime("%m-%d")
-        return ACTORS.get(month_day, "No matching actor found.")
-    except ValueError:
+    match = _DATE_RE.match(birthdate_str)
+    if not match:
         return "Invalid date format. Please use YYYY-MM-DD."
+    month_day = match.group(1)
+    return ACTORS.get(month_day, "No matching actor found.")
 
 
 def main():
