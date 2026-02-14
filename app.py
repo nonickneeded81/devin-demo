@@ -7,8 +7,8 @@ from flask import Flask, jsonify, render_template, request
 ACTORS = {
     "01-09": "Dave Bautista",
     "02-11": "Taylor Lautner",
-    "03-26": "Robert Downey Jr.",
-    "04-04": "Heath Ledger",
+    "03-26": "Keira Knightley",
+    "04-04": "Robert Downey Jr.",
     "05-25": "Cillian Murphy",
     "06-01": "Morgan Freeman",
     "07-09": "Tom Hanks",
