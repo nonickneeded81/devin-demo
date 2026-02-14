@@ -163,14 +163,21 @@
   </div>
 
   <script>
+    const CONFETTI_COLORS = ['#f857a6','#ff5858','#fad0c4','#a18cd1','#fbc2eb','#ffd1ff','#43e97b','#38f9d7','#ffecd2'];
+
+    function escapeHtml(str) {
+      const div = document.createElement('div');
+      div.textContent = str;
+      return div.innerHTML;
+    }
+
     function spawnConfetti() {
-      const colors = ['#f857a6','#ff5858','#fad0c4','#a18cd1','#fbc2eb','#ffd1ff','#43e97b','#38f9d7','#ffecd2'];
       for (let i = 0; i < 60; i++) {
         const el = document.createElement('div');
         el.className = 'confetti';
         el.style.left = Math.random() * 100 + 'vw';
         el.style.top = '-10px';
-        el.style.background = colors[Math.floor(Math.random() * colors.length)];
+        el.style.background = CONFETTI_COLORS[Math.floor(Math.random() * CONFETTI_COLORS.length)];
         el.style.width = (6 + Math.random() * 8) + 'px';
         el.style.height = (6 + Math.random() * 8) + 'px';
         el.style.animationDuration = (2 + Math.random() * 3) + 's';
@@ -180,14 +187,12 @@
       }
     }
 
-    // gentle background confetti
     setInterval(() => {
       const el = document.createElement('div');
       el.className = 'confetti';
-      const colors = ['#f857a6','#ff5858','#fad0c4','#a18cd1','#fbc2eb'];
       el.style.left = Math.random() * 100 + 'vw';
       el.style.top = '-10px';
-      el.style.background = colors[Math.floor(Math.random() * colors.length)];
+      el.style.background = CONFETTI_COLORS[Math.floor(Math.random() * CONFETTI_COLORS.length)];
       el.style.width = '6px';
       el.style.height = '6px';
       el.style.animationDuration = (3 + Math.random() * 3) + 's';
@@ -210,7 +215,7 @@
 
       document.getElementById('greeting').textContent = 'Happy Birthday, ' + data.name + '!';
       document.getElementById('actor').innerHTML =
-        'An actor who shares your birthday: <strong>' + data.actor + '</strong>';
+        'An actor who shares your birthday: <strong>' + escapeHtml(data.actor) + '</strong>';
       document.getElementById('result').style.display = 'block';
       spawnConfetti();
     });

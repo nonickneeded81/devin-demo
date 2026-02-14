@@ -1,20 +1,20 @@
 import sys
 from datetime import datetime
 
-import requests as http_client
+import requests
 from flask import Flask, jsonify, render_template, request
 
 ACTORS = {
     "01-09": "Dave Bautista",
     "02-11": "Taylor Lautner",
     "03-26": "Robert Downey Jr.",
-    "04-04": "Robert Downey Jr.",
+    "04-04": "Heath Ledger",
     "05-25": "Cillian Murphy",
     "06-01": "Morgan Freeman",
     "07-09": "Tom Hanks",
     "08-19": "Matthew Perry",
     "09-02": "Keanu Reeves",
-    "10-28": "Bill Gates (not actor, placeholder example)",
+    "10-28": "Joaquin Phoenix",
     "11-11": "Leonardo DiCaprio",
     "12-18": "Brad Pitt",
 }
@@ -26,7 +26,7 @@ def _search_wikipedia_births(month: str, day: str) -> str:
     url = f"https://api.wikimedia.org/feed/v1/wikipedia/en/onthisday/births/{month}/{day}"
     headers = {"User-Agent": "BirthdayActorMatcher/1.0"}
     try:
-        resp = http_client.get(url, headers=headers, timeout=8)
+        resp = requests.get(url, headers=headers, timeout=8)
         resp.raise_for_status()
         births = resp.json().get("births", [])
         for entry in births:
@@ -71,11 +71,11 @@ def cli():
     birthdate = input("Enter your birthdate (YYYY-MM-DD): ")
     actor = find_actor_by_birthdate(birthdate)
     print(f"\nHello {name}!")
-    print(f"An American male actor born on your date is: {actor}")
+    print(f"An actor who shares your birthday: {actor}")
 
 
 if __name__ == "__main__":
     if "--cli" in sys.argv:
         cli()
     else:
-        app.run(debug=True)
+        app.run()
